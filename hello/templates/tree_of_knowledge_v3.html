@@ -24,7 +24,7 @@
 
 </style>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
 <script>
 
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
@@ -47,56 +47,26 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+d3.json("https://tree-of-knowledge.herokuapp.com/real-data", function(error, flare) {
+  if (error) throw error;
 
-var data = {
-  "fname": "Rachel",
-  "lname": "Rogers",
-  "title": "CEO",
-  "photo": "http://lorempixel.com/60/60/cats/1",
-  "children": [{
-        "fname": "Bob",
-        "lname": "Smith",
-        "title": "President",
-        "photo": "http://lorempixel.com/60/60/cats/2",
-        "children": [{
-              "fname": "Mary",
-              "lname": "Jane",
-              "title": "Vice President",
-              "photo": "http://lorempixel.com/60/60/cats/3",
-              "children": [{
-                "fname": "Bill",
-                "lname": "August",
-                "title": "Dock Worker",
-                "photo": "http://lorempixel.com/60/60/cats/4"
-              }, {
-                "fname": "Reginald",
-                "lname": "Yoyo",
-                "title": "Line Assembly",
-                "photo": "http://lorempixel.com/60/60/cats/5"
-              }]
-            }, {
-              "fname": "Nathan",
-              "lname": "Ringwald",
-              "title": "Comptroller",
-              "photo": "http://lorempixel.com/60/60/cats/6"
-            }]
-  }]
-}
+  root = flare;
+  root.x0 = height / 2;
+  root.y0 = 0;
 
-root = data;
-root.x0 = height / 2;
-root.y0 = 0;
-
-function collapse(d) {
-  if (d.children) {
-    d._children = d.children;
-    d._children.forEach(collapse);
-    d.children = null;
+  function collapse(d) {
+    if (d.children) {
+      d._children = d.children;
+      d._children.forEach(collapse);
+      d.children = null;
+    }
   }
-}
 
-root.children.forEach(collapse);
-update(root);
+  root.children.forEach(collapse);
+  update(root);
+});
+
+d3.select(self.frameElement).style("height", "800px");
 
 function update(source) {
 
@@ -117,44 +87,15 @@ function update(source) {
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
       .on("click", click);
 
-  // add picture
-  nodeEnter
-    .append('defs')
-    .append('pattern')
-    .attr('id', function(d,i){
-      return 'pic_' + d.fname + d.lname;
-    })
-    .attr('height',60)
-    .attr('width',60)
-    .attr('x',0)
-    .attr('y',0)
-    .append('image')
-    .attr('xlink:href',function(d,i){
-      return d.photo;
-    })
-    .attr('height',60)
-    .attr('width',60)
-    .attr('x',0)
-    .attr('y',0);
-
   nodeEnter.append("circle")
       .attr("r", 1e-6)
       .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
 
-  var g = nodeEnter.append("g");
-
-  g.append("text")
-      .attr("x", function(d) { return d.children || d._children ? -35 : 35; })
-      .attr("dy", "1.35em")
+  nodeEnter.append("text")
+      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+      .attr("dy", ".35em")
       .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-      .text(function(d) { return d.fname + " " + d.lname; })
-      .style("fill-opacity", 1e-6);
-
-    g.append("text")
-      .attr("x", function(d) { return d.children || d._children ? -35 : 35; })
-      .attr("dy", "2.5em")
-      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-      .text(function(d) { return d.title; })
+      .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6);
 
   // Transition nodes to their new position.
@@ -163,12 +104,10 @@ function update(source) {
       .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
   nodeUpdate.select("circle")
-      .attr("r", 30)
-      .style("fill", function(d,i){
-        return 'url(#pic_' + d.fname + d.lname+')';
-      });
+      .attr("r", 4.5)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
 
-  nodeUpdate.selectAll("text")
+  nodeUpdate.select("text")
       .style("fill-opacity", 1);
 
   // Transition exiting nodes to the parent's new position.

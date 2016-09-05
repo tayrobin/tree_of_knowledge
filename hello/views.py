@@ -1,9 +1,29 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
-import json, random, requests
+import json, random, requests, psycopg2, urlparse
 
 from .models import Greeting
+
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+conn = psycopg2.connect(
+    database=url.path[1:],
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
+
+cur = conn.cursor()
+
+getTreeData = """WITH data AS(
+						select array_to_json(array_agg(row_to_json(t))) as data
+							from (
+							 SELECT id, name, COALESCE(get_children(id), '[]') as children from tree_data_2
+							) t
+						) SELECT get_tree(data) from data;"""
 
 
 ## homepage
@@ -36,6 +56,15 @@ def showTree3(request):
 def showData(request):
 
 	return render(request, 'data.json')
+
+
+## display live json tree data from database
+def showDataLive(request):
+
+	cur.execute(getTreeData,)
+	treeData = cur.fetchone()
+	print treeData
+	return JsonResponse(treeData)
 
 
 ## keeping so things don't break

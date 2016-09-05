@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^tree/2', hello.views.showTree2, name='showTree2'),
     url(r'^tree/3', hello.views.showTree3, name='showTree3'),
     url(r'^data', hello.views.showData, name='showData'),
+    url(r'^real-data', hello.views.showDataLive, name='showDataLive'),
     url(r'^db', hello.views.db, name='db'),
     url(r'^admin/', include(admin.site.urls)),
 ]
