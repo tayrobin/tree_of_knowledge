@@ -11,6 +11,8 @@ import hello.views
 
 urlpatterns = [
     url(r'^$', hello.views.index, name='index'),
+    url(r'^tree/1', hello.views.showTree1, name='showTree1'),
+    url(r'^tree/2', hello.views.showTree2, name='showTree2'),
     url(r'^db', hello.views.db, name='db'),
     url(r'^admin/', include(admin.site.urls)),
 ]
