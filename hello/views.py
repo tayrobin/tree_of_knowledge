@@ -62,8 +62,8 @@ def showData(request):
 def showDataLive(request):
 
 	cur.execute(getTreeData,)
-	treeData = cur.fetchone()
-	print treeData
+	treeData = cur.fetchone()[0]
+	print "Here's my tree data:",treeData
 	return JsonResponse(treeData)
 
 
