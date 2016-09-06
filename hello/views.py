@@ -136,8 +136,10 @@ def showDataLive(request):
 		for i in range(len(data)):
 			build_tree(data[i]['id'], data[i]['name'], data[i]['link'], data[i]['children'])
 
+		return json.loads(root)
 
-	return JsonResponse(dict(response=root))
+
+	return JsonResponse(get_tree(treeObjects))
 
 
 ## keeping so things don't break
