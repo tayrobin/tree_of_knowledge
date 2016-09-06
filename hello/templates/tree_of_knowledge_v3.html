@@ -1,29 +1,31 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<title>Tree of Knowledge</title>
 <style>
+  .node {
+    cursor: pointer;
+  }
 
-.node {
-  cursor: pointer;
-}
+  .node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+  }
 
-.node circle {
-  fill: #fff;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
+  .node text {
+    font: 10px sans-serif;
+  }
 
-.node text {
-  font: 10px sans-serif;
-}
-
-.link {
-  fill: none;
-  stroke: #ccc;
-  stroke-width: 1.5px;
-}
-
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
 </style>
 <body>
+  <div style="margin:auto;">
+    <p>testing 1, 2, 3...</p>
+  </div>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script>
 
@@ -103,7 +105,7 @@ function update(source) {
     .attr("text-anchor", "middle");
   */
 
-  nodeEnter.append("a").attr("xlink:href", function(d){ return "http://en.wikipedia.org" })
+  nodeEnter.append("a").attr("xlink:href", function(d){ return "http://en.wikipedia.org" }).attr("target", "_blank")
       .append("text").text(function(d) { return d.name; })
       .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
       .attr("dy", ".35em")
