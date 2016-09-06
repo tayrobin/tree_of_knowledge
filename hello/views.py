@@ -77,6 +77,11 @@ def showData(request):
 
 	return render(request, 'data.json')
 
+## display miserables.json data
+def showMiserablesData(request):
+
+	return render(request, 'miserables.json')
+
 
 ## display live json tree data from database
 def showDataLive(request):
@@ -106,7 +111,7 @@ def showDataLive(request):
                 parent["children"].append(item)
 
         #filter out any item that has a parent.
-        #They don't need to appear at the top level, 
+        #They don't need to appear at the top level,
         #since they will appear underneath another item elsewhere.
         topLevelItems = [item for item in myJson if "parent" not in item]
         print topLevelItems
