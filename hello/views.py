@@ -33,7 +33,7 @@ getAllTreeObjects = """SELECT array_to_json(array_agg(row_to_json(t))) AS data
 						) t"""
 
 ## new select with no pre-processing
-getAllTreeObjects2 = """SELECT row_to_json(t) AS data
+getAllTreeObjects2 = """SELECT array_to_json(array_agg(row_to_json(t))) AS data
                         from (
                               SELECT id, name, link, parent_id as parent
                               FROM tree_data_2
@@ -76,8 +76,8 @@ def showData(request):
 def showDataLive(request):
 
 	cur.execute(getAllTreeObjects2,)
-	treeObjects = cur.fetchone()[0]
-	print "Here's all my pre-sorted tree objects:",treeObjects
+	myJson = cur.fetchone()[0]
+	print "Here's all my pre-sorted tree objects:",myJson
 
         #this creates a dictionary that maps id names to JSON items.
         #ex. itemsKeyedById["9Xdd"] gives the jpg item with id "9Xdd"
