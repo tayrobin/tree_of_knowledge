@@ -32,6 +32,13 @@ getAllTreeObjects = """SELECT array_to_json(array_agg(row_to_json(t))) AS data
 						SELECT id, name, link, COALESCE(get_children(id), '[]') AS children FROM tree_data_2
 						) t"""
 
+## new select with no pre-processing
+getAllTreeObjects2 = """SELECT row_to_json(t) AS data
+                        from (
+                              SELECT id, name, link, parent_id as parent
+                              FROM tree_data_2
+                        ) t"""
+
 
 ## homepage
 def index(request):
@@ -68,78 +75,33 @@ def showData(request):
 ## display live json tree data from database
 def showDataLive(request):
 
-	cur.execute(getAllTreeObjects,)
+	cur.execute(getAllTreeObjects2,)
 	treeObjects = cur.fetchone()[0]
 	print "Here's all my pre-sorted tree objects:",treeObjects
 
-	def findRoot(treeObjects):
+        #this creates a dictionary that maps id names to JSON items.
+        #ex. itemsKeyedById["9Xdd"] gives the jpg item with id "9Xdd"
+        itemsKeyedById = {i["id"]: i for i in myJson}
 
-		for obj in treeObjects:
+        #iterate through each item in the `myJson` list.
+        for item in myJson:
+            #does the item have a parent?
+            if "parent" in item:
+                #get the parent item
+                parent = itemsKeyedById[item["parent"]]
+                #if the parent item doesn't have a "children" member, we must create one.
+                if "children" not in parent:
+                    parent["children"] = []
+                #add the item to its parent's "children" list.
+                parent["children"].append(item)
 
-			root = True
-			objId = obj['id']
+        #filter out any item that has a parent.
+        #They don't need to appear at the top level, 
+        #since they will appear underneath another item elsewhere.
+        topLevelItems = [item for item in myJson if "parent" not in item]
+        print topLevelItems
 
-			for obj2 in treeObjects:
-
-				if obj2['id'] == objId:
-					continue
-
-				if obj2['children'] != []:
-
-					for child in obj2['children']:
-
-						if child['id'] == objId:
-							root = False
-
-			if root:
-				return obj
-
-	#treeRoot = findRoot(treeObjects)
-
-	## from online javascript get_tree function
-	def get_tree(data):
-
-		root = []
-
-		def getObject(theObject, id):
-
-			result = None
-
-			if type(theObject) == list:
-
-				for i in range(len(theObject)):
-					result = getObject(theObject[i], id)
-					if result is not None:
-						break
-
-			else:
-
-				for prop in theObject:
-					if prop == 'id':
-						if theObject[prop] == id:
-							return theObject
-
-					if type(theObject[prop]) == dict or type(theObject[prop]) == list:
-						result = getObject(theObject[prop], id)
-						if result is not None:
-							break
-
-			return result
-
-		def build_tree(id, name, link, children):
-			exists = getObject(root, id)
-			if exists is not None:
-				exists['children'] = children
-			else:
-				root.append({'id':id, 'name':name, 'link':link, 'children':children})
-
-		for i in range(len(data)):
-			build_tree(data[i]['id'], data[i]['name'], data[i]['link'], data[i]['children'])
-
-		return root
-
-
-	return JsonResponse({'id':0, 'name':'knowledge', 'link':'', 'children':get_tree(treeObjects)})
+	return JsonResponse(topLevelItems)
 
 
 ## keeping so things don't break
