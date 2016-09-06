@@ -18,12 +18,19 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
+## built from: http://lakshminp.com/building-nested-hierarchy-json-relational-db
 getTreeData = """WITH data AS(
 						select array_to_json(array_agg(row_to_json(t))) as data
 							from (
 							 SELECT id, name, link, COALESCE(get_children(id), '[]') as children from tree_data_2
 							) t
 						) SELECT get_tree(data) from data;"""
+
+## saving this for manual processing in python below
+getAllTreeObjects = """SELECT array_to_json(array_agg(row_to_json(t))) AS data
+						from (
+						SELECT id, name, link, COALESCE(get_children(id), '[]') AS children FROM tree_data_2
+						) t"""
 
 
 ## homepage
@@ -61,12 +68,76 @@ def showData(request):
 ## display live json tree data from database
 def showDataLive(request):
 
-	cur.execute(getTreeData,)
-	#treeData = cur.fetchone()[0]
-	treeData = cur.fetchone()[0][0]
-	print "Here's my tree data:",treeData
-	#return JsonResponse(dict(response=list(treeData)))
-	return JsonResponse(treeData)
+	cur.execute(getAllTreeObjects,)
+	treeObjects = cur.fetchone()[0]
+	print "Here's all my pre-sorted tree objects:",treeObjects
+
+	def findRoot(treeObjects):
+
+		for obj in treeObjects:
+
+			root = True
+			objId = obj['id']
+
+			for obj2 in treeObjects:
+
+				if obj2['id'] == objId:
+					continue
+
+				if obj2['children'] != []:
+
+					for child in obj2['children']:
+
+						if child['id'] == objId:
+							root = False
+
+			if root:
+				return obj
+
+	treeRoot = findRoot(treeObjects)
+
+	## from online javascript get_tree function
+	def get_tree(data):
+
+		root = []
+
+		def getObject(theObject, id):
+
+			result = None
+
+			if type(theObject) == list:
+
+				for i in range(len(theObject)):
+					result = getObject(theObject[i], id)
+					if result is not None:
+						break
+
+			else:
+
+				for prop in theObject:
+					if prop == 'id':
+						if theObject[prop] == id:
+							return theObject
+
+					if type(theObject[prop]) == dict or type(theObject[prop]) == list:
+						result = getObject(theObject[prop], id):
+						if result is not None:
+							break
+
+			return result
+
+		def build_tree(id, name, link, children):
+			exists = getObject(root, id)
+			if exists is not None:
+				exists['children'] = children
+			else:
+				root.append({'id':id, 'name':name, 'link':link, 'children':children})
+
+		for i in range(len(data)):
+			build_tree(data[i]['id'], data[i]['name'], data[i]['link'], data[i]['children'])
+
+
+	return JsonResponse(dict(response=root))
 
 
 ## keeping so things don't break
