@@ -178,6 +178,16 @@ function update(source) {
   });
 }
 
+//function for random colors
+function getRandomColor() {
+    var letters = '789ABCD';
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.round(Math.random() * 6)];
+    }
+    return color;
+}
+
 // Toggle children on click.
 function click(d) {
   if (d.children) {
@@ -187,6 +197,8 @@ function click(d) {
     d.children = d._children;
     d._children = null;
   }
+  d3.select("body").transition()
+    .style("background-color", getRandomColor());
   update(d);
 }
 
