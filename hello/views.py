@@ -62,9 +62,11 @@ def showData(request):
 def showDataLive(request):
 
 	cur.execute(getTreeData,)
-	treeData = cur.fetchone()[0]
+	#treeData = cur.fetchone()[0]
+	treeData = cur.fetchone()[0][0]
 	print "Here's my tree data:",treeData
-	return JsonResponse(dict(response=list(treeData)))
+	#return JsonResponse(dict(response=list(treeData)))
+	return JsonResponse(treeData)
 
 
 ## keeping so things don't break
