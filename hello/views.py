@@ -79,6 +79,10 @@ def showDataLive(request):
 	myJson = cur.fetchone()[0]
 	print "Here's all my pre-sorted tree objects:",myJson
 
+        for i in range(len(myJson)):
+           if myJson[i]['parent'] is None:
+              myJson[i].pop('parent', None)
+
         #this creates a dictionary that maps id names to JSON items.
         #ex. itemsKeyedById["9Xdd"] gives the jpg item with id "9Xdd"
         itemsKeyedById = {i["id"]: i for i in myJson}
