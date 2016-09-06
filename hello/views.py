@@ -66,6 +66,12 @@ def showTree3(request):
 ##### END REAL ONE #####
 
 
+## experimenting with different styles of data trees
+def showTree4(request):
+
+    return render(request, 'tree_of_knowledge_v4.html')
+
+
 ## display json data
 def showData(request):
 
