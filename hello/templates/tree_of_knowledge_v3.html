@@ -24,7 +24,7 @@
 </style>
 <body>
   <div style="margin:auto;">
-    <p>testing 1, 2, 3...</p>
+    <p style="text-align:center;">testing 1, 2, 3...</p>
   </div>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script>
@@ -105,7 +105,7 @@ function update(source) {
     .attr("text-anchor", "middle");
   */
 
-  nodeEnter.append("a").attr("xlink:href", function(d){ return "http://en.wikipedia.org" }).attr("target", "_blank")
+  nodeEnter.append("a").attr("xlink:href", function(d){ return d.link }).attr("target", "_blank")
       .append("text").text(function(d) { return d.name; })
       .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
       .attr("dy", ".35em")

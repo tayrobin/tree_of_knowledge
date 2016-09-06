@@ -21,7 +21,7 @@ cur = conn.cursor()
 getTreeData = """WITH data AS(
 						select array_to_json(array_agg(row_to_json(t))) as data
 							from (
-							 SELECT id, name, COALESCE(get_children(id), '[]') as children from tree_data_2
+							 SELECT id, name, link, COALESCE(get_children(id), '[]') as children from tree_data_2
 							) t
 						) SELECT get_tree(data) from data;"""
 
