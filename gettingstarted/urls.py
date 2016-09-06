@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^tree/2', hello.views.showTree2, name='showTree2'),
     url(r'^tree/3', hello.views.showTree3, name='showTree3'),
     url(r'^tree/4', hello.views.showTree4, name='showTree4'),
+    url(r'^tree-5', hello.views.showTree5, name='showTree5'),
     url(r'^data', hello.views.showData, name='showData'),
     url(r'^miserables-data', hello.views.showMiserablesData, name='showMiserablesData'),
     url(r'^real-data', hello.views.showDataLive, name='showDataLive'),

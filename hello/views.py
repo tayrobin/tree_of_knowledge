@@ -42,25 +42,21 @@ getAllTreeObjects2 = """SELECT array_to_json(array_agg(row_to_json(t))) AS data
 
 ## homepage
 def index(request):
-
 	return render(request, 'base.html')
 
 
 ## show first version of tree
 def showTree1(request):
-
 	return render(request, 'tree_of_knowledge.html')
 
 
 ## show second version of tree
 def showTree2(request):
-
 	return render(request, 'tree_of_knowledge_v2.html')
 
 ##### REAL ONE #####
 ## show my version of tree, with my data
 def showTree3(request):
-
 	return render(request, 'tree_of_knowledge_v3.html')
 
 ##### END REAL ONE #####
@@ -68,18 +64,20 @@ def showTree3(request):
 
 ## experimenting with different styles of data trees
 def showTree4(request):
-
     return render(request, 'tree_of_knowledge_v4.html')
+
+
+## experimenting with pannable data tree
+def showTree5(request):
+    return render(request, 'tree_of_knowledge_v5.html')
 
 
 ## display json data
 def showData(request):
-
 	return render(request, 'data.json')
 
 ## display miserables.json data
 def showMiserablesData(request):
-
 	return render(request, 'miserables.json')
 
 
