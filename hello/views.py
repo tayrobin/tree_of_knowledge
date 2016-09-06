@@ -120,7 +120,7 @@ def showDataLive(request):
 							return theObject
 
 					if type(theObject[prop]) == dict or type(theObject[prop]) == list:
-						result = getObject(theObject[prop], id):
+						result = getObject(theObject[prop], id)
 						if result is not None:
 							break
 
