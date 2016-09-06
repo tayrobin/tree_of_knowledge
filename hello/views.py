@@ -105,7 +105,7 @@ def showDataLive(request):
         topLevelItems = [item for item in myJson if "parent" not in item]
         print topLevelItems
 
-	return JsonResponse(topLevelItems)
+	return JsonResponse({'id':0, 'name':'root', 'link':'', 'children':topLevelItems)
 
 
 ## keeping so things don't break
