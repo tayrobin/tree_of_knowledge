@@ -90,6 +90,7 @@ def inputData(request):
 
         ## check for valid password, for now to prevent spam
         if 'password' in inputs and inputs['password'] is not None:
+
             password = inputs['password']
 
             if password != inputPassword:
