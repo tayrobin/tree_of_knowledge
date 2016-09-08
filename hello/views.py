@@ -136,7 +136,7 @@ def inputData(request):
                 conn.commit()
                 dataInserted = cur.fetchone()
 
-                print "New Knowledge added to the database! (%(child)s is a child of %(parent)s)"%{'name':name, 'parent':parent_name}
+                print "New Knowledge added to the database! (%(child)s is a child of %(parent)s)"%{'child':name, 'parent':parent_name}
 
                 return JsonResponse(dataInserted, status=200)
 
