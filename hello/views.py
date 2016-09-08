@@ -84,9 +84,9 @@ def showTree5(request):
 def inputData(request):
 
     if request.method == 'POST':
-		print "POST order up!"
-		print request.POST
-		inputs = dict(request.POST)
+        print "POST order up!"
+        print request.POST
+        inputs = dict(request.POST)
 
         ## check for valid password, for now to prevent spam
         if 'password' in inputs and inputs['password'] is not None:
