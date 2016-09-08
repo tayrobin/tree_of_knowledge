@@ -98,6 +98,7 @@ def inputData(request):
             if password != inputPassword:
                 ## permission denied
                 #return HttpResponse(status=403)
+                print "Password Incorrect. Given:%s"%password
                 raise PermissionDenied
 
             elif password == inputPassword:
@@ -107,6 +108,7 @@ def inputData(request):
                     name = inputs['name'].capitalize()
                 else:
                     ## don't accept null names, return 400 error
+                    print "invalid name provided: %s"%inputs['name']
                     return HttpResponse('You gave me an invalid Name.', status=400)
 
                 if 'link' in inputs and inputs['link'] is not None:
@@ -118,6 +120,7 @@ def inputData(request):
                     parent_name = inputs['parent']
                 else:
                     ## don't accept null parent names, return 400 error
+                    print "invalid parent name provided: %s"%inputs['parent']
                     return HttpResponse('You have me an invalid Parent Name.', status=400)
 
                 ## figure out which parent_id to use...
@@ -125,6 +128,7 @@ def inputData(request):
                 parent_id = cur.fetchone()[0]
 
                 if parent_id is None or parent_id == '':
+                    print "couldn't match a parent name to the one provided: %s"%parent_name
                     return HttpResponse('I was unable to find a Parent ID to match the Parent you provided: (%(parent_name)s)'%{'parent_name':parent_name}, status=400)
 
                 cur.execute(insertNewKnowledge, {'name':name, 'link':link, 'parent_id':parent_id})
