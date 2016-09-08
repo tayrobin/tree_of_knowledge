@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
+from django.views.decorators.csrf import csrf_exempt
 import json, random, requests, psycopg2, urlparse, os
 
 from .models import Greeting
@@ -81,6 +82,7 @@ def showTree5(request):
 
 
 ## add new data to the database
+@csrf_exempt
 def inputData(request):
 
     if request.method == 'POST':
