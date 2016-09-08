@@ -135,10 +135,11 @@ def inputData(request):
                 cur.execute(insertNewKnowledge, {'name':name, 'link':link, 'parent_id':parent_id})
                 conn.commit()
                 dataInserted = cur.fetchone()
+                print dataInserted
 
                 print "New Knowledge added to the database! (%(child)s is a child of %(parent)s)"%{'child':name, 'parent':parent_name}
 
-                return JsonResponse(dataInserted, status=200)
+                return JsonResponse({'dataInserted':dataInserted}, status=200)
 
 
 ## display json data
