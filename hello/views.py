@@ -91,9 +91,9 @@ def inputData(request):
         inputs = dict(request.POST)
 
         ## check for valid password, for now to prevent spam
-        if 'password' in inputs and inputs['password'] is not None:
+        if 'password' in inputs and inputs['password'] != []:
 
-            password = inputs['password']
+            password = inputs['password'][0]
 
             if password != inputPassword:
                 ## permission denied
@@ -104,28 +104,29 @@ def inputData(request):
             elif password == inputPassword:
 
                 ## process inputs
-                if 'name' in inputs and inputs['name'] is not None and inputs['name'] != '':
-                    name = inputs['name'].capitalize()
+                if 'name' in inputs and inputs['name'] != [] and inputs['name'][0] != '':
+                    name = inputs['name'][0].capitalize()
                 else:
                     ## don't accept null names, return 400 error
-                    print "invalid name provided: %s"%inputs['name']
+                    print "invalid name provided: %s"%inputs['name'][0]
                     return HttpResponse('You gave me an invalid Name.', status=400)
 
-                if 'link' in inputs and inputs['link'] is not None:
-                    link = inputs['link']
+                if 'link' in inputs and inputs['link'] != []:
+                    link = inputs['link'][0]
                 else:
                     link = None
 
-                if 'parent' in inputs and inputs['parent'] is not None and inputs['parent'] != '':
-                    parent_name = inputs['parent']
+                if 'parent' in inputs and inputs['parent'] != [] and inputs['parent'][0] != '':
+                    parent_name = inputs['parent'][0]
                 else:
                     ## don't accept null parent names, return 400 error
-                    print "invalid parent name provided: %s"%inputs['parent']
+                    print "invalid parent name provided: %s"%inputs['parent'][0]
                     return HttpResponse('You have me an invalid Parent Name.', status=400)
 
                 ## figure out which parent_id to use...
                 cur.execute(selectParentId, {'parent_name':parent_name})
                 parent_id = cur.fetchone()[0]
+                print "Found Parent ID: %s"%parent_id
 
                 if parent_id is None or parent_id == '':
                     print "couldn't match a parent name to the one provided: %s"%parent_name
