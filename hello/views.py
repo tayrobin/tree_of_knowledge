@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.core.exceptions import PermissionDenied
 import json, random, requests, psycopg2, urlparse, os
 
 from .models import Greeting
 
 urlparse.uses_netloc.append("postgres")
 url = urlparse.urlparse(os.environ["DATABASE_URL"])
+inputPassword = os.environ["INPUT_PASSWORD"]
 
 conn = psycopg2.connect(
     database=url.path[1:],
@@ -38,6 +40,12 @@ getAllTreeObjects2 = """SELECT array_to_json(array_agg(row_to_json(t))) AS data
                               SELECT id, name, link, parent_id as parent
                               FROM tree_data_2
                         ) t"""
+
+## add new data into the tree_data_2 table
+insertNewKnowledge = "INSERT INTO tree_data_2 (name, link, parent_id) VALUES (%(name)s, %(link)s, %(parent_id)s) RETURNING *"
+
+## get a parent ID given a name
+selectParentId = "SELECT id FROM tree_data_2 WHERE LOWER(name) LIKE LOWER(%(parent_name)s) LIMIT 1"
 
 
 ## homepage
@@ -72,9 +80,63 @@ def showTree5(request):
     return render(request, 'tree_of_knowledge_v5.html')
 
 
+## add new data to the database
+def inputData(request):
+
+    if request.method == 'POST':
+		print "POST order up!"
+		print request.POST
+		inputs = dict(request.POST)
+
+        ## check for valid password, for now to prevent spam
+        if 'password' in inputs and inputs['password'] is not None:
+            password = inputs['password']
+
+            if password != inputPassword:
+                ## permission denied
+                #return HttpResponse(status=403)
+                raise PermissionDenied
+
+            elif password == inputPassword:
+
+                ## process inputs
+                if 'name' in inputs and inputs['name'] is not None and inputs['name'] != '':
+                    name = inputs['name'].capitalize()
+                else:
+                    ## don't accept null names, return 400 error
+                    return HttpResponse('You gave me an invalid Name.', status=400)
+
+                if 'link' in inputs and inputs['link'] is not None:
+                    link = inputs['link']
+                else:
+                    link = None
+
+                if 'parent' in inputs and inputs['parent'] is not None and inputs['parent'] != '':
+                    parent_name = inputs['parent']
+                else:
+                    ## don't accept null parent names, return 400 error
+                    return HttpResponse('You have me an invalid Parent Name.', status=400)
+
+                ## figure out which parent_id to use...
+                cur.execute(selectParentId, {'parent_name':parent_name})
+                parent_id = cur.fetchone()[0]
+
+                if parent_id is None or parent_id == '':
+                    return HttpResponse('I was unable to find a Parent ID to match the Parent you provided: (%(parent_name)s)'%{'parent_name':parent_name}, status=400)
+
+                cur.execute(insertNewKnowledge, {'name':name, 'link':link, 'parent_id':parent_id})
+                conn.commit()
+                dataInserted = cur.fetchone()
+
+                print "New Knowledge added to the database! (%(child)s is a child of %(parent)s)"%{'name':name, 'parent':parent_name}
+
+                return JsonResponse(dataInserted, status=200)
+
+
 ## display json data
 def showData(request):
 	return render(request, 'data.json')
+
 
 ## display miserables.json data
 def showMiserablesData(request):
