@@ -125,10 +125,10 @@ def inputData(request):
 
                 ## figure out which parent_id to use...
                 cur.execute(selectParentId, {'parent_name':parent_name})
-                parent_id = cur.fetchone()[0]
-                print "Found Parent ID: %s"%parent_id
-
-                if parent_id is None or parent_id == '':
+                try:
+                    parent_id = cur.fetchone()[0]
+                    print "Found Parent ID: %s"%parent_id
+                except:
                     print "couldn't match a parent name to the one provided: %s"%parent_name
                     return HttpResponse('I was unable to find a Parent ID to match the Parent you provided: (%(parent_name)s)'%{'parent_name':parent_name}, status=400)
 
